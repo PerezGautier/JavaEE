@@ -9,18 +9,20 @@ public class SinglePlayerGame {
 
         private int scorefinal;
         private int quilleRestantes;
-        private int strike;
-        private int spare;
-        private int compteur;
+        private int boule;
+        private int tour;
+        private int listeDeStrike [];
+        private int listeDeSpare [];
 	/**
 	 * Constructeur
 	 */
 	public SinglePlayerGame() {
             this.scorefinal = 0;
             this.quilleRestantes = 10;
-            this.strike = 0;
-            this.spare = 0;
-            this.compteur = 0;
+            this.tour=0;
+            this.boule = 1;
+            this.listeDeStrike = new int[10];
+            this.listeDeSpare = new int[10];
 	}
 
 	/**
@@ -30,46 +32,55 @@ public class SinglePlayerGame {
 	 * ce lancé
 	 */
 	public void lancer(int nombreDeQuillesAbattues) {
-          if(this.compteur<22){
+          if(this.tour<10){
                 // point du spare d'avant
-                if(this.spare == 1){
+                if(this.listeDeSpare[this.tour]==1){
                      this.scorefinal += nombreDeQuillesAbattues;
-                     this.spare = 0;
                 }
                 // point du strike d'avant
-                if(this.strike > 0){
+                if(this.listeDeStrike[this.tour]==1){
                      this.scorefinal += nombreDeQuillesAbattues;
-                     this.strike--;
                 }
-
+                
                 // cas normal
                 if(this.quilleRestantes > nombreDeQuillesAbattues){
                     this.scorefinal += nombreDeQuillesAbattues;
                     this.quilleRestantes -= nombreDeQuillesAbattues;
-                    this.compteur++;
+                    this.tour++;
                 }
 
                 //spare
                 // si on est au deuxieme lancé et qu'on fait tomber toutes les quilles restantes
-                if(((this.compteur%2) == 1)&&(nombreDeQuillesAbattues == this.quilleRestantes) && (this.compteur<20)){
-                    this.spare = 1;
+                if((this.boule== 1)&&(nombreDeQuillesAbattues == this.quilleRestantes)){
+                    this.listeDeSpare[this.tour+1]+=1;
                     this.scorefinal += nombreDeQuillesAbattues;
                     this.quilleRestantes -= nombreDeQuillesAbattues;
-                    this.compteur++;
+                    this.boule++;
                 }
 
                 //strike
-                if (((this.compteur%2) == 0) && (nombreDeQuillesAbattues == 10) && (this.compteur<20)){
-                    this.strike = 2;
+                if ((this.boule == 1) && (nombreDeQuillesAbattues == 10)){   
+                    this.listeDeStrike[this.tour+1]+=1;
+                    this.listeDeStrike[this.tour+2]+=1;
                     this.scorefinal += nombreDeQuillesAbattues;
                     this.quilleRestantes -= nombreDeQuillesAbattues;
-                    this.compteur+=2;
+                    this.tour++;
                 }
 
 
-                if(this.quilleRestantes == 0 || (this.compteur%2) == 0){
+                if(this.quilleRestantes == 0 || (this.boule == 2)){
                     this.quilleRestantes = 10;
+                    this.boule=1;
+                    this.tour++;
                 }
+          }
+          else if(this.tour>9 && this.tour<12){
+            this.scorefinal += nombreDeQuillesAbattues;
+            this.quilleRestantes -= nombreDeQuillesAbattues;
+            this.tour++;
+            if(this.quilleRestantes == 0){
+                this.quilleRestantes = 10;
+            }
           }
           else{
               System.out.println("La partie est fini!");
