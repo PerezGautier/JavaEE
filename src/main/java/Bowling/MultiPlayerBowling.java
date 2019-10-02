@@ -3,6 +3,7 @@ package Bowling;
 
 import bowling.MultiPlayerGame;
 import bowling.SinglePlayerGame;
+import java.util.ArrayList;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,7 +17,9 @@ import bowling.SinglePlayerGame;
  * @author pedago
  */
 public class MultiPlayerBowling implements MultiPlayerGame{
-    SinglePlayerGame [] gameList;
+    //SinglePlayerGame [] gameList;
+    ArrayList<SinglePlayerGame> gameList = new ArrayList<SinglePlayerGame>(); 
+    String[]PlayerName;
     int JoueurCourant=0;
     
     /**
@@ -31,13 +34,12 @@ public class MultiPlayerBowling implements MultiPlayerGame{
             if(playerName.length==0 || playerName==null ){
                 throw new IllegalArgumentException("La liste des joueur ne doit pas etre nulle");
             }
-            
+            this.PlayerName=playerName;
             for(int i = 0; i<playerName.length; i++){
                 SinglePlayerGame game = new SinglePlayerGame();
-                gameList[i] = game;
+                this.gameList.add(i,game);
             }
-            
-            return "Prochain tir : joueur "+playerName[1]+", tour n° "+gameList[0].getFrameNumber()+", boule n°"+gameList[0].getNextBallNumber();
+            return "Prochain tir : joueur "+playerName[this.JoueurCourant]+", tour n°"+this.gameList.get(this.JoueurCourant).getFrameNumber()+", boule n°"+this.gameList.get(this.JoueurCourant).getNextBallNumber();
         }
 	
 	/**
@@ -50,7 +52,14 @@ public class MultiPlayerBowling implements MultiPlayerGame{
 	 */
     @Override
 	public String lancer(int nombreDeQuillesAbattues) throws Exception{
-            return "";
+            if(this.gameList.size() == 0){
+                throw new IllegalArgumentException("La partie n'est pas démarrée!");
+            }
+            
+            this.gameList.get(this.JoueurCourant).lancer(nombreDeQuillesAbattues);
+            this.JoueurCourant = (this.JoueurCourant+1)%gameList.size();
+            
+            return "Prochain tir : joueur "+this.PlayerName[this.JoueurCourant]+", tour n°"+this.gameList.get(this.JoueurCourant).getFrameNumber()+", boule n°"+this.gameList.get(this.JoueurCourant).getNextBallNumber();
         }
 	
 	/**
@@ -61,6 +70,11 @@ public class MultiPlayerBowling implements MultiPlayerGame{
 	 */
     @Override
 	public int scoreFor(String playerName) throws Exception{
-            return 0;
+            for(int i = 0; i < this.PlayerName.length; i++){
+                if(this.PlayerName[i] == playerName){
+                    return this.gameList.get(i).score(); 
+                }
+            }
+            throw new IllegalArgumentException("Ce joueur ne joue pas dans cette partie"); 
         }
 }
