@@ -69,5 +69,30 @@ public class HsqlDBTest {
 		ds.setUser("sa");
 		ds.setPassword("sa");
 		return ds;
-	}	
+	}
+        
+        @Test
+	public void ExistingProduct() throws SQLException {
+		Product product = myObject.getProduct(0);
+                String name = product.getName();
+                assertEquals("Iron Iron",name);
+	}
+        @Test
+	public void nonExistingProduct() throws SQLException {
+		Product product = myObject.getProduct(-1);
+                assertNull("product should be null, product does not exist !", product);
+	}
+        
+        @Test
+	public void InsertProduct() throws SQLException {
+                Product product = myObject.getProduct(666);
+                assertNull("product should be null, product does not exist !", product);
+                
+                Product newproduct = new Product(666,"bleu",10.6);
+                assertEquals(1, myObject.addProduct(newproduct));
+                
+                Product product2 = myObject.getProduct(666);
+                String name = product2.getName();
+                assertEquals("bleu",name);
+	}
 }
