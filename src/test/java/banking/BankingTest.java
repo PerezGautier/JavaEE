@@ -48,6 +48,30 @@ public class BankingTest {
 		// Le dernier paramètre correspond à la marge d'erreur tolérable
 		assertEquals("Balance incorrecte !", 100.0f, balance, 0.001f);
 	}
+        
+        @Test(expected = IllegalArgumentException.class)
+	public void bankTransferTransactionWithUnknowId() throws Exception {
+            float amount = 10.0f;
+            int fromCustomer = -1;
+            int toCustomer = 1;
+            myDAO.bankTransferTransaction(fromCustomer, toCustomer, amount);
+	}
+        
+        @Test(expected = IllegalArgumentException.class)
+	public void bankTransferTransactionWithUnknowId2() throws Exception {
+            float amount = 10.0f;
+            int fromCustomer = 0;
+            int toCustomer = -1;
+            myDAO.bankTransferTransaction(fromCustomer, toCustomer, amount);
+	}
+        
+        @Test(expected = SQLException.class)
+	public void bankTransferTransactionWithNegativeAmount() throws Exception {
+            float amount = 10000.0f;
+            int fromCustomer = 0;
+            int toCustomer = 1;
+            myDAO.bankTransferTransaction(fromCustomer, toCustomer, amount);
+	}
 
 	@Test
 	public void successfulTransfer() throws Exception {
