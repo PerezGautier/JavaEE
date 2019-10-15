@@ -76,9 +76,90 @@ public class DAO {
 	 * taille
 	 * @throws java.lang.Exception si la transaction a échoué
 	 */
-	public void createInvoice(CustomerEntity customer, int[] productIDs, int[] quantities)
-		throws Exception {
-		throw new UnsupportedOperationException("Pas encore implémenté");
+	public void createInvoice(CustomerEntity customer, int[] productIDs, int[] quantities) throws Exception {
+		if(productIDs.length != quantities.length){
+                    throw new IllegalArgumentException("Il doit y avoir le même nombre de produit que de quantité de produit");
+                }
+                String sql = "INSERT INTO Invoice (CustomerID) VALUES (?)";
+                try (	Connection myConnection = myDataSource.getConnection();
+			PreparedStatement statement = myConnection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)) {
+			
+			myConnection.setAutoCommit(false); // On démarre une transaction
+			try {
+				statement.setInt(1, customer.getCustomerId());
+				int numberUpdated = statement.executeUpdate();
+                                
+                                
+                                ResultSet clefs = statement.getGeneratedKeys(); 
+                                clefs.next();
+                                System.out.println("La première clef autogénérée vaut " + clefs.getInt(1));
+                                
+                                for(int i = 0; i<productIDs.length;i++){
+                                    CreateItem(clefs.getInt(1), i, productIDs[i], quantities[i], getCost(productIDs[i]));
+                                }
+                                
+				// Tout s'est bien passé, on peut valider la transaction
+				myConnection.commit();
+			} catch (Exception ex) {
+				myConnection.rollback(); // On annule la transaction
+				throw ex;       
+			} finally {
+				 // On revient au mode de fonctionnement sans transaction
+				myConnection.setAutoCommit(true);				
+			}
+		}
+	}
+        
+        public double getCost(int productsId)throws Exception{
+            double result = 0;
+            String sql1 = "SELECT Price FROM Product WHERE ID=?";
+            try (	Connection myConnection = myDataSource.getConnection();
+			PreparedStatement statement = myConnection.prepareStatement(sql1)) {
+			
+			myConnection.setAutoCommit(false); // On démarre une transaction
+			try {
+				statement.setInt(1, productsId);
+				ResultSet rs = statement.executeQuery();
+                                result = rs.getInt("Price");
+
+				// Tout s'est bien passé, on peut valider la transaction
+				myConnection.commit();
+			} catch (Exception ex) {
+				myConnection.rollback(); // On annule la transaction
+				throw ex;       
+			} finally {
+				 // On revient au mode de fonctionnement sans transaction
+				myConnection.setAutoCommit(true);				
+			}
+		}
+            return result;
+        }
+        public void CreateItem(int cleInvoice, int cleItem , int productID, int quantity, double cost) throws Exception {
+		
+                String sql2 = "INSERT INTO Item VALUES (?,?,?,?,?)";
+                try (	Connection myConnection = myDataSource.getConnection();
+			PreparedStatement statement = myConnection.prepareStatement(sql2)) {
+			
+			myConnection.setAutoCommit(false); // On démarre une transaction
+			try {
+				statement.setInt(1, cleInvoice);
+                                statement.setInt(2, cleItem);
+                                statement.setInt(3, productID);
+                                statement.setInt(4, quantity);
+                                statement.setDouble(5, cost);
+                                
+				int numberUpdated = statement.executeUpdate();
+                                
+				// Tout s'est bien passé, on peut valider la transaction
+				myConnection.commit();
+			} catch (Exception ex) {
+				myConnection.rollback(); // On annule la transaction
+				throw ex;       
+			} finally {
+				 // On revient au mode de fonctionnement sans transaction
+				myConnection.setAutoCommit(true);				
+			}
+		}
 	}
 
 	/**
