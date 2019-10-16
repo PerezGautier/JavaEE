@@ -95,7 +95,7 @@ public class DAO {
                                 System.out.println("La première clef autogénérée vaut " + clefs.getInt(1));
                                 
                                 for(int i = 0; i<productIDs.length;i++){
-                                    CreateItem(clefs.getInt(1), i, productIDs[i], quantities[i], getCost(productIDs[i]));
+                                    CreateItem(clefs.getInt(1), i, productIDs[i], quantities[i]);
                                 }
                                 
 				// Tout s'est bien passé, on peut valider la transaction
@@ -110,55 +110,32 @@ public class DAO {
 		}
 	}
         
-        public double getCost(int productsId)throws Exception{
-            double result = 0;
+        public float getCost(int productsId)throws Exception{
+            float result = 0;
             String sql1 = "SELECT Price FROM Product WHERE ID=?";
             try (	Connection myConnection = myDataSource.getConnection();
 			PreparedStatement statement = myConnection.prepareStatement(sql1)) {
 			
-			myConnection.setAutoCommit(false); // On démarre une transaction
-			try {
-				statement.setInt(1, productsId);
-				ResultSet rs = statement.executeQuery();
-                                result = rs.getInt("Price");
-
-				// Tout s'est bien passé, on peut valider la transaction
-				myConnection.commit();
-			} catch (Exception ex) {
-				myConnection.rollback(); // On annule la transaction
-				throw ex;       
-			} finally {
-				 // On revient au mode de fonctionnement sans transaction
-				myConnection.setAutoCommit(true);				
-			}
+                        statement.setInt(1, productsId);
+                        ResultSet rs = statement.executeQuery();
+                        rs.next();
+                        result = rs.getFloat("Price");
 		}
             return result;
         }
-        public void CreateItem(int cleInvoice, int cleItem , int productID, int quantity, double cost) throws Exception {
+        public void CreateItem(int cleInvoice, int cleItem , int productID, int quantity) throws Exception {
 		
-                String sql2 = "INSERT INTO Item VALUES (?,?,?,?,?)";
+                String sql2 = "INSERT INTO Item VALUES (?,?,?,?,(SELECT Price FROM Product WHERE ID=?))";
                 try (	Connection myConnection = myDataSource.getConnection();
 			PreparedStatement statement = myConnection.prepareStatement(sql2)) {
 			
-			myConnection.setAutoCommit(false); // On démarre une transaction
-			try {
-				statement.setInt(1, cleInvoice);
-                                statement.setInt(2, cleItem);
-                                statement.setInt(3, productID);
-                                statement.setInt(4, quantity);
-                                statement.setDouble(5, cost);
-                                
-				int numberUpdated = statement.executeUpdate();
-                                
-				// Tout s'est bien passé, on peut valider la transaction
-				myConnection.commit();
-			} catch (Exception ex) {
-				myConnection.rollback(); // On annule la transaction
-				throw ex;       
-			} finally {
-				 // On revient au mode de fonctionnement sans transaction
-				myConnection.setAutoCommit(true);				
-			}
+                        statement.setInt(1, cleInvoice);
+                        statement.setInt(2, cleItem);
+                        statement.setInt(3, productID);
+                        statement.setInt(4, quantity);
+                        statement.setDouble(5, productID);
+
+                        statement.executeUpdate();
 		}
 	}
 
