@@ -60,7 +60,7 @@ public class ShowClientInState extends HttpServlet {
 					throw new Exception("State inconnu");
 				}
                                 out.println("<table border=1>");
-                                out.println("<th><td>Customer</td><td>Name</td></th>");
+                                out.println("<tr><th>ID</th><th>Name</th><th>Address</th></tr>");
                                 for(int i = 0; i< rs.size();i++){
                                     // Afficher les propriétés du client
                                     out.printf("<tr><td> %d </td> <td> %s </td> <td> %s </td></tr>",
