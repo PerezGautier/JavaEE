@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>fr.irit.bastide</groupId>
-	<artifactId>EditionDiscountMaven</artifactId>
+	<artifactId>DiscountAjax</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>EditionDiscountMaven</name>
+	<name>DiscountAjax</name>
 
 	<properties>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
@@ -45,6 +45,12 @@
 			<artifactId>derbytools</artifactId>
 			<version>10.14.1.0</version>
 		</dependency>	
+                <!-- for generating JSON -->
+                <dependency>
+                    <groupId>com.google.code.gson</groupId>
+                    <artifactId>gson</artifactId>
+                    <version>2.8.2</version>
+                </dependency>
 	</dependencies>
 
 	<build>
